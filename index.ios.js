@@ -10,6 +10,7 @@ import {
   Text,
   Modal,
   TouchableHighlight,
+  TouchableOpacity,
   View
 } from "react-native";
 import Camera from "react-native-camera";
@@ -24,9 +25,9 @@ export default class ghostcam extends Component {
     selectedImage: null,
     modalVisible: false
   };
-  componentDidMount() {
+  refreshPhotos() {
     CameraRoll.getPhotos({
-      first: 10,
+      first: 50,
       groupTypes: "SavedPhotos",
       assetType: "Photos"
     }).then(
@@ -42,6 +43,9 @@ export default class ghostcam extends Component {
       },
       e => logError(e)
     );
+  }
+  componentDidMount() {
+    this.refreshPhotos();
   }
   render() {
     if (true) {
@@ -99,11 +103,15 @@ export default class ghostcam extends Component {
                   width: 50,
                   height: 50
                 }}
-                source={this.state.selectedImage}
+                source={
+                  this.state.photos[0]
+                    ? this.state.photos[0].image
+                    : this.state.selectedImage
+                }
               />
             </TouchableHighlight>
 
-            <TouchableHighlight onPress={this.takePicture.bind(this)}>
+            <TouchableOpacity onPress={this.takePicture.bind(this)}>
               <View
                 style={{
                   borderRadius: 75,
@@ -114,7 +122,7 @@ export default class ghostcam extends Component {
                   borderColor: "#fff"
                 }}
               />
-            </TouchableHighlight>
+            </TouchableOpacity>
           </Camera>
         </View>
       );
@@ -123,7 +131,7 @@ export default class ghostcam extends Component {
   takePicture() {
     this.camera
       .capture()
-      .then(data => console.log(data))
+      .then(data => this.refreshPhotos())
       .catch(err => console.error(err));
   }
 }
