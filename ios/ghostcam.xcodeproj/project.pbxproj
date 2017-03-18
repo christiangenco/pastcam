@@ -1090,6 +1090,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.gen.pastcam;
 				PRODUCT_NAME = ghostcam;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -1112,6 +1113,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.gen.pastcam;
 				PRODUCT_NAME = ghostcam;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
