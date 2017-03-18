@@ -1,6 +1,6 @@
 # Next
 
-* obvious flash (like facebook messenger)
+* limit to portrait; align landscape photos correctly
 * logo
 * LaunchScreen.xib
 * publish

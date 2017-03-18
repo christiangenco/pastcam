@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import {
   AppRegistry,
+  Animated,
   CameraRoll,
   Dimensions,
   Image,
@@ -25,7 +26,8 @@ export default class ghostcam extends Component {
     dataSource: new ListView.DataSource({ rowHasChanged: (a, b) => a !== b }),
     selectedImage: null,
     modalVisible: false,
-    opacity: 0.5
+    opacity: 0.5,
+    flashOpacity: new Animated.Value(0)
   };
   componentWillMount() {
     this._panResponder = PanResponder.create({
@@ -123,6 +125,15 @@ export default class ghostcam extends Component {
             source={this.state.selectedImage}
             {...this._panResponder.panHandlers}
           />
+          <Animated.View
+            style={{
+              backgroundColor: "white",
+              position: "absolute",
+              width,
+              height,
+              opacity: this.state.flashOpacity
+            }}
+          />
 
           <TouchableHighlight
             onPress={() => this.setState({ modalVisible: true })}
@@ -162,6 +173,17 @@ export default class ghostcam extends Component {
       .capture()
       .then(data => this.refreshPhotos())
       .catch(err => console.error(err));
+    this.state.flashOpacity.setValue(0);
+    Animated.sequence([
+      Animated.timing(this.state.flashOpacity, {
+        toValue: 1,
+        duration: 100
+      }),
+      Animated.timing(this.state.flashOpacity, {
+        toValue: 0,
+        duration: 100
+      })
+    ]).start();
   }
 }
 
