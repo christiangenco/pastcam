@@ -11,6 +11,7 @@ import {
   Modal,
   TouchableHighlight,
   TouchableOpacity,
+  PanResponder,
   View
 } from "react-native";
 import Camera from "react-native-camera";
@@ -23,8 +24,37 @@ export default class ghostcam extends Component {
     photos: [],
     dataSource: new ListView.DataSource({ rowHasChanged: (a, b) => a !== b }),
     selectedImage: null,
-    modalVisible: false
+    modalVisible: false,
+    opacity: 0.5
   };
+  componentWillMount() {
+    this._panResponder = PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      // onPanResponderGrant: this._handlePanResponderGrant,
+      onPanResponderMove: this._handlePanResponderMove.bind(this)
+      // onPanResponderRelease: this._handlePanResponderEnd,
+      // onPanResponderTerminate: this._handlePanResponderEnd
+    });
+    // this._previousLeft = 20;
+    // this._previousTop = 84;
+    // this._circleStyles = {
+    //   style: {
+    //     left: this._previousLeft,
+    //     top: this._previousTop,
+    //     backgroundColor: "green"
+    //   }
+    // };
+  }
+  _handlePanResponderMove(e, gestureState) {
+    // this._circleStyles.style.left = this._previousLeft + gestureState.dx;
+    // this._circleStyles.style.top = this._previousTop + gestureState.dy;
+    // alert(gestureState.moveX);
+    this.setState({ opacity: gestureState.moveX / width });
+  }
+  componentDidMount() {
+    this.refreshPhotos();
+  }
   refreshPhotos() {
     CameraRoll.getPhotos({
       first: 50,
@@ -43,9 +73,6 @@ export default class ghostcam extends Component {
       },
       e => logError(e)
     );
-  }
-  componentDidMount() {
-    this.refreshPhotos();
   }
   render() {
     if (true) {
@@ -81,6 +108,7 @@ export default class ghostcam extends Component {
             ref={cam => this.camera = cam}
             style={styles.preview}
             aspect={Camera.constants.Aspect.fill}
+            {...this._panResponder.panHandlers}
           >
             <Image
               style={{
@@ -89,7 +117,7 @@ export default class ghostcam extends Component {
                 height,
                 left: 0,
                 top: 0,
-                opacity: 0.5
+                opacity: this.state.opacity
               }}
               source={this.state.selectedImage}
             />
