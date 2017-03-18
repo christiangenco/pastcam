@@ -1,8 +1,8 @@
 # Next
 
-* highlight current photo in list view
 * obvious flash (like facebook messenger)
 * logo
+* LaunchScreen.xib
 * publish
 
 ---

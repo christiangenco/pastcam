@@ -83,9 +83,23 @@ export default class ghostcam extends Component {
                     selectedImage: rowData.image,
                     modalVisible: false
                   })}
-                style={styles.imageThumb}
+                style={[styles.imageThumb]}
               >
-                <Image style={styles.imageThumb} source={rowData.image} />
+                <Image
+                  style={[styles.imageThumb]}
+                  source={rowData.image}
+                  selected={true}
+                >
+                  <View
+                    style={{
+                      borderColor: this.state.selectedImage === rowData.image
+                        ? "rgb(99, 145, 257)"
+                        : "rgba(0, 0, 0, 0)",
+                      borderWidth: 5,
+                      flex: 1
+                    }}
+                  />
+                </Image>
               </TouchableHighlight>
             )}
           />

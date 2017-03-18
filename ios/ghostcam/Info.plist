@@ -51,11 +51,11 @@
 		</dict>
 	</dict>
   <key>NSCameraUsageDescription</key>
-  <string>Your message to user when the camera is accessed for the first time</string>
+  <string>PastCam needs to use your camera, because it takes pictures.</string>
 
   <!-- Include this only if you are planning to use the camera roll -->
   <key>NSPhotoLibraryUsageDescription</key>
-  <string>Your message to user when the photo library is accessed for the first time</string>
+  <string>PastCam needs to access your photo library, because it overlays pictures from your library on your camera.</string>
 
   <!-- Include this only if you are planning to use the microphone for video recording -->
   <key>NSMicrophoneUsageDescription</key>
