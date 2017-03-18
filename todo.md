@@ -1,11 +1,9 @@
 # Next
 
-* limit to portrait; align landscape photos correctly
-* logo
-* LaunchScreen.xib
 * publish
 
 ---
 
+* align landscape photos correctly
 * switch to front facing camera
 * landscape

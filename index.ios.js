@@ -48,7 +48,7 @@ export default class ghostcam extends Component {
   }
   refreshPhotos() {
     CameraRoll.getPhotos({
-      first: 50,
+      first: 100,
       groupTypes: "SavedPhotos",
       assetType: "Photos"
     }).then(
@@ -66,6 +66,7 @@ export default class ghostcam extends Component {
     );
   }
   render() {
+    console.log(this.state.selectedImage);
     return (
       <View style={styles.container}>
         <Modal
@@ -76,6 +77,7 @@ export default class ghostcam extends Component {
           supportedOrientations={["portrait"]}
         >
           <ListView
+            initialListSize={18}
             contentContainerStyle={styles.list}
             dataSource={this.state.dataSource}
             renderRow={rowData => (
@@ -120,10 +122,10 @@ export default class ghostcam extends Component {
               height,
               left: 0,
               top: 0,
-              opacity: this.state.opacity
+              opacity: this.state.opacity,
+              transform: [{ rotate: "0deg" }]
             }}
             source={this.state.selectedImage}
-            {...this._panResponder.panHandlers}
           />
           <Animated.View
             style={{
@@ -133,10 +135,14 @@ export default class ghostcam extends Component {
               height,
               opacity: this.state.flashOpacity
             }}
+            {...this._panResponder.panHandlers}
           />
 
           <TouchableHighlight
-            onPress={() => this.setState({ modalVisible: true })}
+            onPress={() => {
+              this.setState({ modalVisible: true });
+              this.refreshPhotos();
+            }}
             style={{ position: "absolute", left: 10, bottom: 10 }}
           >
             <Image
