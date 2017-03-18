@@ -6,7 +6,9 @@ import {
   Image,
   ListView,
   StyleSheet,
+  StatusBar,
   Text,
+  Modal,
   TouchableHighlight,
   View
 } from "react-native";
@@ -19,8 +21,8 @@ export default class ghostcam extends Component {
   state = {
     photos: [],
     dataSource: new ListView.DataSource({ rowHasChanged: (a, b) => a !== b }),
-    width: 0,
-    height: 0
+    selectedImage: null,
+    modalVisible: false
   };
   componentDidMount() {
     CameraRoll.getPhotos({
@@ -44,30 +46,79 @@ export default class ghostcam extends Component {
   render() {
     if (true) {
       return (
-        <ListView
-          contentContainerStyle={styles.list}
-          dataSource={this.state.dataSource}
-          renderRow={rowData => (
-            <Image style={styles.imageThumb} source={rowData.image} />
-          )}
-        />
+        <View style={styles.container}>
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={!this.state.selectedImage || this.state.modalVisible}
+            onRequestClose={() => this.setState({ modalVisible: false })}
+            supportedOrientations={["portrait"]}
+          >
+            <ListView
+              contentContainerStyle={styles.list}
+              dataSource={this.state.dataSource}
+              renderRow={rowData => (
+                <TouchableHighlight
+                  onPress={() =>
+                    this.setState({
+                      selectedImage: rowData.image,
+                      modalVisible: false
+                    })}
+                  style={styles.imageThumb}
+                >
+                  <Image style={styles.imageThumb} source={rowData.image} />
+                </TouchableHighlight>
+              )}
+            />
+          </Modal>
+
+          <StatusBar hidden={true} />
+          <Camera
+            ref={cam => this.camera = cam}
+            style={styles.preview}
+            aspect={Camera.constants.Aspect.fill}
+          >
+            <Image
+              style={{
+                position: "absolute",
+                width,
+                height,
+                left: 0,
+                top: 0,
+                opacity: 0.5
+              }}
+              source={this.state.selectedImage}
+            />
+
+            <TouchableHighlight
+              onPress={() => this.setState({ modalVisible: true })}
+              style={{ position: "absolute", left: 10, bottom: 10 }}
+            >
+              <Image
+                style={{
+                  width: 50,
+                  height: 50
+                }}
+                source={this.state.selectedImage}
+              />
+            </TouchableHighlight>
+
+            <TouchableHighlight onPress={this.takePicture.bind(this)}>
+              <View
+                style={{
+                  borderRadius: 75,
+                  height: 75,
+                  width: 75,
+                  marginBottom: 10,
+                  borderWidth: 5,
+                  borderColor: "#fff"
+                }}
+              />
+            </TouchableHighlight>
+          </Camera>
+        </View>
       );
     }
-
-    return (
-      <View style={styles.container}>
-        <Camera
-          ref={cam => this.camera = cam}
-          style={styles.preview}
-          aspect={Camera.constants.Aspect.fill}
-        >
-
-          <Text style={styles.capture} onPress={this.takePicture.bind(this)}>
-            [CAPTURE]
-          </Text>
-        </Camera>
-      </View>
-    );
   }
   takePicture() {
     this.camera
@@ -82,20 +133,13 @@ const imageWidth = width / 3 - photoGutter;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: "row"
+    flexDirection: "row",
+    backgroundColor: "#000"
   },
   preview: {
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "center"
-  },
-  capture: {
-    flex: 0,
-    backgroundColor: "#fff",
-    borderRadius: 5,
-    color: "#000",
-    padding: 10,
-    margin: 40
   },
   list: {
     flexDirection: "row",
