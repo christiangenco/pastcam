@@ -17,7 +17,7 @@ import {
 import Camera from "react-native-camera";
 
 var logError = require("logError");
-const { width, height } = Dimensions.get("window");
+let { width, height } = Dimensions.get("window");
 
 export default class ghostcam extends Component {
   state = {
@@ -29,29 +29,18 @@ export default class ghostcam extends Component {
   };
   componentWillMount() {
     this._panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponder: (e, gesture) => true,
+      onStartShouldSetPanResponderCapture: (e, gesture) => true,
+      onMoveShouldSetPanResponder: (e, gesture) => true,
+      onMoveShouldSetPanResponderCapture: (e, gesture) => true,
       // onPanResponderGrant: this._handlePanResponderGrant,
-      onPanResponderMove: this._handlePanResponderMove.bind(this)
+      onPanResponderMove: (e, gesture) =>
+        this.setState({ opacity: gesture.moveX / width })
       // onPanResponderRelease: this._handlePanResponderEnd,
       // onPanResponderTerminate: this._handlePanResponderEnd
     });
-    // this._previousLeft = 20;
-    // this._previousTop = 84;
-    // this._circleStyles = {
-    //   style: {
-    //     left: this._previousLeft,
-    //     top: this._previousTop,
-    //     backgroundColor: "green"
-    //   }
-    // };
   }
-  _handlePanResponderMove(e, gestureState) {
-    // this._circleStyles.style.left = this._previousLeft + gestureState.dx;
-    // this._circleStyles.style.top = this._previousTop + gestureState.dy;
-    // alert(gestureState.moveX);
-    this.setState({ opacity: gestureState.moveX / width });
-  }
+
   componentDidMount() {
     this.refreshPhotos();
   }
@@ -75,86 +64,84 @@ export default class ghostcam extends Component {
     );
   }
   render() {
-    if (true) {
-      return (
-        <View style={styles.container}>
-          <Modal
-            animationType="slide"
-            transparent={false}
-            visible={!this.state.selectedImage || this.state.modalVisible}
-            onRequestClose={() => this.setState({ modalVisible: false })}
-            supportedOrientations={["portrait"]}
-          >
-            <ListView
-              contentContainerStyle={styles.list}
-              dataSource={this.state.dataSource}
-              renderRow={rowData => (
-                <TouchableHighlight
-                  onPress={() =>
-                    this.setState({
-                      selectedImage: rowData.image,
-                      modalVisible: false
-                    })}
-                  style={styles.imageThumb}
-                >
-                  <Image style={styles.imageThumb} source={rowData.image} />
-                </TouchableHighlight>
-              )}
-            />
-          </Modal>
+    return (
+      <View style={styles.container}>
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={!this.state.selectedImage || this.state.modalVisible}
+          onRequestClose={() => this.setState({ modalVisible: false })}
+          supportedOrientations={["portrait"]}
+        >
+          <ListView
+            contentContainerStyle={styles.list}
+            dataSource={this.state.dataSource}
+            renderRow={rowData => (
+              <TouchableHighlight
+                onPress={() =>
+                  this.setState({
+                    selectedImage: rowData.image,
+                    modalVisible: false
+                  })}
+                style={styles.imageThumb}
+              >
+                <Image style={styles.imageThumb} source={rowData.image} />
+              </TouchableHighlight>
+            )}
+          />
+        </Modal>
 
-          <StatusBar hidden={true} />
-          <Camera
-            ref={cam => this.camera = cam}
-            style={styles.preview}
-            aspect={Camera.constants.Aspect.fill}
+        <StatusBar hidden={true} />
+        <Camera
+          ref={cam => this.camera = cam}
+          style={styles.preview}
+          aspect={Camera.constants.Aspect.fill}
+        >
+          <Image
+            style={{
+              position: "absolute",
+              width,
+              height,
+              left: 0,
+              top: 0,
+              opacity: this.state.opacity
+            }}
+            source={this.state.selectedImage}
             {...this._panResponder.panHandlers}
+          />
+
+          <TouchableHighlight
+            onPress={() => this.setState({ modalVisible: true })}
+            style={{ position: "absolute", left: 10, bottom: 10 }}
           >
             <Image
               style={{
-                position: "absolute",
-                width,
-                height,
-                left: 0,
-                top: 0,
-                opacity: this.state.opacity
+                width: 50,
+                height: 50
               }}
-              source={this.state.selectedImage}
+              source={
+                this.state.photos[0]
+                  ? this.state.photos[0].image
+                  : this.state.selectedImage
+              }
             />
+          </TouchableHighlight>
 
-            <TouchableHighlight
-              onPress={() => this.setState({ modalVisible: true })}
-              style={{ position: "absolute", left: 10, bottom: 10 }}
-            >
-              <Image
-                style={{
-                  width: 50,
-                  height: 50
-                }}
-                source={
-                  this.state.photos[0]
-                    ? this.state.photos[0].image
-                    : this.state.selectedImage
-                }
-              />
-            </TouchableHighlight>
-
-            <TouchableOpacity onPress={this.takePicture.bind(this)}>
-              <View
-                style={{
-                  borderRadius: 75,
-                  height: 75,
-                  width: 75,
-                  marginBottom: 10,
-                  borderWidth: 5,
-                  borderColor: "#fff"
-                }}
-              />
-            </TouchableOpacity>
-          </Camera>
-        </View>
-      );
-    }
+          <TouchableOpacity onPress={this.takePicture.bind(this)}>
+            <View
+              style={{
+                borderRadius: 75,
+                height: 75,
+                width: 75,
+                marginBottom: 10,
+                borderWidth: 5,
+                borderColor: "#fff"
+              }}
+            />
+          </TouchableOpacity>
+        </Camera>
+      </View>
+    );
   }
   takePicture() {
     this.camera
