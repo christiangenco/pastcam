@@ -36,7 +36,7 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>PastCam takes pictures. That's kind of the point.`x`</string>
+	<string>PastCam takes pictures. That&apos;s kind of the point.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>NSPhotoLibraryUsageDescription</key>
