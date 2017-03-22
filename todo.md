@@ -7,4 +7,3 @@
 
 * automatically save a second photo with the two pictures stitched together
 * landscape: https://github.com/lwansbrough/react-native-camera#orientation
-* align landscape photos correctly

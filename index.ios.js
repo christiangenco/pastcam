@@ -67,13 +67,21 @@ export default class ghostcam extends Component {
           dataSource: this.state.dataSource.cloneWithRows(photos),
           photosPageInfo: photosRes.page_info
         });
-        console.log(JSON.stringify(this.state.photos));
+        // console.log(JSON.stringify(this.state.photos));
       },
       e => logError(e)
     );
   }
   render() {
-    // console.log(this.state.selectedImage);
+    let cameraWidth = width, cameraHeight = height, cameraXOffset = 0;
+    if (this.state.selectedImage) {
+      // h1/w1 = h2/w2
+      // h1 = h2*w1/w2
+      cameraHeight = this.state.selectedImage.height *
+        width /
+        this.state.selectedImage.width;
+      cameraXOffset = (height - cameraHeight) / 2;
+    }
     return (
       <View style={styles.container}>
         <Modal
@@ -119,14 +127,23 @@ export default class ghostcam extends Component {
         <StatusBar hidden={true} />
         <Camera
           ref={cam => this.camera = cam}
-          style={[styles.preview, { height }]}
+          style={[
+            styles.preview,
+            {
+              height: cameraHeight,
+              width: cameraWidth,
+              marginTop: cameraXOffset
+            }
+          ]}
           aspect={Camera.constants.Aspect.fill}
+          captureTarget={Camera.constants.CaptureTarget.disk}
+          keepAwake={true}
         >
           <Image
             style={{
               position: "absolute",
-              width,
-              height,
+              width: cameraWidth,
+              height: cameraHeight,
               left: 0,
               top: 0,
               opacity: this.state.opacity,
