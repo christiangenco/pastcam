@@ -5,5 +5,6 @@
 
 ---
 
-* automatically save a second photo with the two pictures stitched together
+* automatically save a second photo with the two pictures stitched together (smart based on landscape and portrait)
 * landscape: https://github.com/lwansbrough/react-native-camera#orientation
+* marketing picture of recreating a kardashian picture; recreating "American Gothic"

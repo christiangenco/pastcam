@@ -136,7 +136,9 @@ export default class ghostcam extends Component {
             }
           ]}
           aspect={Camera.constants.Aspect.fill}
-          captureTarget={Camera.constants.CaptureTarget.disk}
+          captureTarget={
+            Camera.constants.CaptureTarget.disk /*disk or cameraRoll*/
+          }
           keepAwake={true}
         >
           <Image
@@ -154,6 +156,7 @@ export default class ghostcam extends Component {
           />
 
           {/* this might fuck up touch to focus */}
+
           <Animated.View
             style={{
               backgroundColor: "white",
@@ -186,15 +189,21 @@ export default class ghostcam extends Component {
           />
         </TouchableHighlight>
 
-        <TouchableOpacity onPress={this.takePicture.bind(this)}>
+        <TouchableOpacity
+          onPress={this.takePicture.bind(this)}
+          style={{
+            bottom: 10,
+            right: width / 2 - 75 / 2,
+            height: 75,
+            width: 75,
+            position: "absolute"
+          }}
+        >
           <View
             style={{
               borderRadius: 75,
               height: 75,
               width: 75,
-              position: "absolute",
-              bottom: 10,
-              right: width / 2 - 75 / 2 - 10 / 2,
               borderWidth: 5,
               borderColor: "#fff"
             }}
@@ -207,11 +216,29 @@ export default class ghostcam extends Component {
     this.camera
       .capture()
       .then(rawImageData => {
+        // get height and width
+        return new Promise((resolve, reject) => {
+          Image.getSize(rawImageData.path, (width, height) =>
+            resolve({ path: rawImageData.path, width, height }));
+        });
+      })
+      .then(rawImageData => {
+        let cameraWidth = rawImageData.width,
+          cameraHeight = rawImageData.height,
+          cameraOffset = 0;
+        // h1/w1 = h2/w2 => h1 = h2*w1/w2
+        cameraHeight = rawImageData.width *
+          this.state.selectedImage.height /
+          this.state.selectedImage.width;
+        cameraOffset = (rawImageData.height - cameraHeight) / 2;
+
         ImageEditor.cropImage(
           rawImageData.path,
           {
-            offset: { x: 0, y: 0 },
-            size: { width: 20, height: 20 }
+            offset: { x: 0, y: cameraOffset },
+            size: { width: cameraWidth, height: cameraHeight }
+            // resizeMode
+            // displaySize
           },
           uri => {
             CameraRoll.saveToCameraRoll(uri).then(res => {
