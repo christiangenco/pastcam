@@ -6,6 +6,7 @@ import {
   CameraRoll,
   Dimensions,
   Image,
+  ImageEditor,
   ListView,
   StyleSheet,
   StatusBar,
@@ -118,7 +119,7 @@ export default class ghostcam extends Component {
         <StatusBar hidden={true} />
         <Camera
           ref={cam => this.camera = cam}
-          style={styles.preview}
+          style={[styles.preview, { height }]}
           aspect={Camera.constants.Aspect.fill}
         >
           <Image
@@ -134,6 +135,8 @@ export default class ghostcam extends Component {
             }}
             source={this.state.selectedImage}
           />
+
+          {/* this might fuck up touch to focus */}
           <Animated.View
             style={{
               backgroundColor: "white",
@@ -144,48 +147,66 @@ export default class ghostcam extends Component {
             }}
             {...this._panResponder.panHandlers}
           />
-
-          <TouchableHighlight
-            onPress={() => {
-              this.setState({ modalVisible: true });
-              this.refreshPhotos();
-            }}
-            style={{ position: "absolute", left: 10, bottom: 10 }}
-          >
-            <Image
-              style={{
-                width: 50,
-                height: 50
-              }}
-              source={
-                this.state.photos[0]
-                  ? this.state.photos[0].image
-                  : this.state.selectedImage
-              }
-            />
-          </TouchableHighlight>
-
-          <TouchableOpacity onPress={this.takePicture.bind(this)}>
-            <View
-              style={{
-                borderRadius: 75,
-                height: 75,
-                width: 75,
-                marginBottom: 10,
-                borderWidth: 5,
-                borderColor: "#fff"
-              }}
-            />
-          </TouchableOpacity>
         </Camera>
+
+        <TouchableHighlight
+          onPress={() => {
+            this.setState({ modalVisible: true });
+            this.refreshPhotos();
+          }}
+          style={{ position: "absolute", left: 10, bottom: 10 }}
+        >
+          <Image
+            style={{
+              width: 50,
+              height: 50
+            }}
+            source={
+              this.state.photos[0]
+                ? this.state.photos[0].image
+                : this.state.selectedImage
+            }
+          />
+        </TouchableHighlight>
+
+        <TouchableOpacity onPress={this.takePicture.bind(this)}>
+          <View
+            style={{
+              borderRadius: 75,
+              height: 75,
+              width: 75,
+              position: "absolute",
+              bottom: 10,
+              right: width / 2 - 75 / 2 - 10 / 2,
+              borderWidth: 5,
+              borderColor: "#fff"
+            }}
+          />
+        </TouchableOpacity>
       </View>
     );
   }
   takePicture() {
     this.camera
       .capture()
-      .then(data => this.refreshPhotos())
-      .catch(err => console.error(err));
+      .then(rawImageData => {
+        ImageEditor.cropImage(
+          rawImageData.path,
+          {
+            offset: { x: 0, y: 0 },
+            size: { width: 20, height: 20 }
+          },
+          uri => {
+            CameraRoll.saveToCameraRoll(uri).then(res => {
+              // delete rawImageData
+              this.refreshPhotos();
+            });
+          },
+          err => logError
+        );
+      })
+      .catch(logError);
+
     this.state.flashOpacity.setValue(0);
     Animated.sequence([
       Animated.timing(this.state.flashOpacity, {
