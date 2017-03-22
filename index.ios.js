@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import {
   AppRegistry,
+  AppState,
   Animated,
   CameraRoll,
   Dimensions,
@@ -45,6 +46,11 @@ export default class ghostcam extends Component {
 
   componentDidMount() {
     this.refreshPhotos();
+    AppState.addEventListener("change", nextAppState => {
+      if (nextAppState === "active") {
+        this.refreshPhotos();
+      }
+    });
   }
   refreshPhotos() {
     CameraRoll.getPhotos({
@@ -66,7 +72,7 @@ export default class ghostcam extends Component {
     );
   }
   render() {
-    console.log(this.state.selectedImage);
+    // console.log(this.state.selectedImage);
     return (
       <View style={styles.container}>
         <Modal
@@ -123,7 +129,8 @@ export default class ghostcam extends Component {
               left: 0,
               top: 0,
               opacity: this.state.opacity,
-              transform: [{ rotate: "0deg" }]
+              transform: [{ rotate: "0deg" }],
+              resizeMode: "contain"
             }}
             source={this.state.selectedImage}
           />
