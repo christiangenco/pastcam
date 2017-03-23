@@ -18,6 +18,9 @@ import {
   View
 } from "react-native";
 import Camera from "react-native-camera";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 var logError = require("logError");
 let { width, height } = Dimensions.get("window");
@@ -29,7 +32,10 @@ export default class ghostcam extends Component {
     selectedImage: null,
     modalVisible: false,
     opacity: 0.5,
-    flashOpacity: new Animated.Value(0)
+    flashOpacity: new Animated.Value(0),
+    stitch: false,
+    flip: false,
+    flashMode: Camera.constants.FlashMode.auto
   };
   componentWillMount() {
     this._panResponder = PanResponder.create({
@@ -53,19 +59,19 @@ export default class ghostcam extends Component {
       }
     });
   }
-  refreshPhotos(after=null) {
-    console.log(`after=${after}`)
+  refreshPhotos(after = null) {
+    console.log(`after=${after}`);
     const getPhotosParams = {
-      first: 3*10,
+      first: 3 * 10,
       groupTypes: "SavedPhotos",
-      assetType: "Photos",
-    }
-    if(after) getPhotosParams.after = after;
+      assetType: "Photos"
+    };
+    if (after) getPhotosParams.after = after;
     CameraRoll.getPhotos(getPhotosParams).then(
       photosRes => {
         // console.log(JSON.stringify(photosRes));
         let photos = photosRes.edges.map(r => r.node);
-        if(after) photos = [...this.state.photos, ...photos];
+        if (after) photos = [...this.state.photos, ...photos];
         this.setState({
           photos,
           dataSource: this.state.dataSource.cloneWithRows(photos),
@@ -96,11 +102,15 @@ export default class ghostcam extends Component {
           supportedOrientations={["portrait"]}
         >
           <ListView
-            initialListSize={3*7}
-            pageSize={3*12}
+            initialListSize={3 * 7}
+            pageSize={3 * 12}
             // scrollRenderAheadDistance={500}
             onEndReached={() => {
-              this.refreshPhotos(this.state.photosPageInfo ? this.state.photosPageInfo.end_cursor : "");
+              this.refreshPhotos(
+                this.state.photosPageInfo
+                  ? this.state.photosPageInfo.end_cursor
+                  : ""
+              );
             }}
             // onEndReachedThreshold={500}
             contentContainerStyle={styles.list}
@@ -151,6 +161,9 @@ export default class ghostcam extends Component {
             Camera.constants.CaptureTarget.disk /*disk or cameraRoll*/
           }
           keepAwake={true}
+          type={this.state.flip ? "back" : "front"}
+          mirrorImage={this.state.flip}
+          flashMode={this.state.flashMode}
         >
           <Image
             style={{
@@ -220,6 +233,75 @@ export default class ghostcam extends Component {
             }}
           />
         </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => this.setState({ flip: !this.state.flip })}
+          style={{
+            top: 10,
+            right: 10,
+            height: 30,
+            width: 30,
+            position: "absolute",
+            backgroundColor: "transparent"
+          }}
+        >
+          <Ionicons name="ios-reverse-camera" size={30} color="#fff" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            const modes = [
+              Camera.constants.FlashMode.auto,
+              Camera.constants.FlashMode.on,
+              Camera.constants.FlashMode.off
+            ];
+            let i = modes.indexOf(this.state.flashMode);
+            i++;
+            if (i >= modes.length) i = 0;
+            this.setState({
+              flashMode: modes[i]
+            });
+          }}
+          style={{
+            top: 10,
+            left: 10,
+            height: 30,
+            width: 30,
+            position: "absolute",
+            backgroundColor: "transparent"
+          }}
+        >
+          <MaterialIcons
+            name={
+              this.state.flashMode === Camera.constants.FlashMode.auto
+                ? "flash-auto"
+                : this.state.flashMode === Camera.constants.FlashMode.on
+                    ? "flash-on"
+                    : "flash-off"
+            }
+            size={30}
+            color="#fff"
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => this.setState({ stitch: !this.state.stitch })}
+          style={{
+            top: 10,
+            right: width / 2 - 30 / 2,
+            height: 30,
+            width: 30,
+            position: "absolute",
+            backgroundColor: "transparent"
+          }}
+        >
+          <MaterialIcons
+            name="flip"
+            size={30}
+            color={this.state.stitch ? "#fff" : "#aaa"}
+          />
+        </TouchableOpacity>
+
       </View>
     );
   }
