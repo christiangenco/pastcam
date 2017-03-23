@@ -1,6 +1,5 @@
 # Next
 
-* request more pictures when scrolling to the bottom
 * switch to front facing camera as in-app-purchase (mirrorImage: true, type: "front" https://github.com/chirag04/react-native-in-app-utils)
 * **perfectly line up** in the second screenshot
 
