@@ -1,7 +1,8 @@
 # Next
 
-* make sure it works with square photos (crop image: https://facebook.github.io/react-native/docs/imageeditor.html)
-* switch to front facing camera (mirrorImage: true, type: "front")
+* request more pictures when scrolling to the bottom
+* switch to front facing camera as in-app-purchase (mirrorImage: true, type: "front" https://github.com/chirag04/react-native-in-app-utils)
+* **perfectly line up** in the second screenshot
 
 ---
 

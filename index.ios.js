@@ -53,15 +53,19 @@ export default class ghostcam extends Component {
       }
     });
   }
-  refreshPhotos() {
-    CameraRoll.getPhotos({
-      first: 100,
+  refreshPhotos(after=null) {
+    console.log(`after=${after}`)
+    const getPhotosParams = {
+      first: 3*10,
       groupTypes: "SavedPhotos",
-      assetType: "Photos"
-    }).then(
+      assetType: "Photos",
+    }
+    if(after) getPhotosParams.after = after;
+    CameraRoll.getPhotos(getPhotosParams).then(
       photosRes => {
         // console.log(JSON.stringify(photosRes));
-        const photos = photosRes.edges.map(r => r.node);
+        let photos = photosRes.edges.map(r => r.node);
+        if(after) photos = [...this.state.photos, ...photos];
         this.setState({
           photos,
           dataSource: this.state.dataSource.cloneWithRows(photos),
@@ -92,9 +96,16 @@ export default class ghostcam extends Component {
           supportedOrientations={["portrait"]}
         >
           <ListView
-            initialListSize={18}
+            initialListSize={3*7}
+            pageSize={3*12}
+            // scrollRenderAheadDistance={500}
+            onEndReached={() => {
+              this.refreshPhotos(this.state.photosPageInfo ? this.state.photosPageInfo.end_cursor : "");
+            }}
+            // onEndReachedThreshold={500}
             contentContainerStyle={styles.list}
             dataSource={this.state.dataSource}
+            enableEmptySections={false}
             renderRow={rowData => (
               <TouchableHighlight
                 onPress={() =>
