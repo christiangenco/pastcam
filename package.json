@@ -10,6 +10,7 @@
 		"react": "~15.4.1",
 		"react-native": "0.42.2",
 		"react-native-camera": "^0.6.0",
+		"react-native-in-app-utils": "^5.2.0",
 		"react-native-vector-icons": "^4.0.0"
 	},
 	"devDependencies": {

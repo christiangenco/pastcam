@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
+    <device id="ipad9_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
@@ -21,10 +21,11 @@
             </subviews>
             <color key="backgroundColor" red="0.18039215689999999" green="0.80000000000000004" blue="0.4431372549" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
-                <constraint firstItem="kyb-ME-paC" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="KXE-19-K1o"/>
-                <constraint firstAttribute="trailing" secondItem="kyb-ME-paC" secondAttribute="trailing" id="MgU-sC-Jeo"/>
-                <constraint firstItem="kyb-ME-paC" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="dOp-co-Cq6"/>
-                <constraint firstAttribute="bottom" secondItem="kyb-ME-paC" secondAttribute="bottom" id="yC3-71-pmE"/>
+                <constraint firstItem="kyb-ME-paC" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="FBx-It-N3a"/>
+                <constraint firstAttribute="bottom" secondItem="kyb-ME-paC" secondAttribute="bottom" id="Zgk-PE-s79"/>
+                <constraint firstItem="kyb-ME-paC" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="nc0-gG-Xhy"/>
+                <constraint firstAttribute="trailing" secondItem="kyb-ME-paC" secondAttribute="trailing" id="vxU-cE-0uN"/>
+                <constraint firstItem="kyb-ME-paC" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="zyE-7i-bWp"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>

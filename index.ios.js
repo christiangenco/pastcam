@@ -3,6 +3,7 @@ import {
   AppRegistry,
   AppState,
   Animated,
+  AlertIOS,
   CameraRoll,
   Dimensions,
   Image,
@@ -15,7 +16,8 @@ import {
   TouchableHighlight,
   TouchableOpacity,
   PanResponder,
-  View
+  View,
+  NativeModules
 } from "react-native";
 import Camera from "react-native-camera";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -24,6 +26,8 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 
 var logError = require("logError");
 let { width, height } = Dimensions.get("window");
+
+const { InAppUtils, PicStitcher } = NativeModules;
 
 export default class ghostcam extends Component {
   state = {
@@ -58,6 +62,14 @@ export default class ghostcam extends Component {
         this.refreshPhotos();
       }
     });
+
+    InAppUtils.loadProducts(
+      ["co.gen.pastcam.frontfacingcamera"],
+      (error, products) => {
+        if (products.length > 0)
+          AlertIOS.alert("loadProducts", JSON.stringify(products));
+      }
+    );
   }
   refreshPhotos(after = null) {
     console.log(`after=${after}`);
@@ -77,6 +89,9 @@ export default class ghostcam extends Component {
           dataSource: this.state.dataSource.cloneWithRows(photos),
           photosPageInfo: photosRes.page_info
         });
+
+        // AlertIOS.alert("photo[0]", JSON.stringify(photos[0].image.uri));
+        PicStitcher.stitch(photos[0].image.uri, photos[1].image.uri);
         // console.log(JSON.stringify(this.state.photos));
       },
       e => logError(e)
