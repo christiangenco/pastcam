@@ -23,11 +23,12 @@ import Camera from "react-native-camera";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import Orientation from "react-native-orientation";
 
 var logError = require("logError");
 let { width, height } = Dimensions.get("window");
 
-const { InAppUtils, PicStitcher } = NativeModules;
+// const { InAppUtils, PicStitcher } = NativeModules;
 
 export default class ghostcam extends Component {
   state = {
@@ -39,7 +40,8 @@ export default class ghostcam extends Component {
     flashOpacity: new Animated.Value(0),
     stitch: false,
     flip: false,
-    flashMode: Camera.constants.FlashMode.auto
+    flashMode: Camera.constants.FlashMode.auto,
+    orientation: "PORTRAIT"
   };
   componentWillMount() {
     this._panResponder = PanResponder.create({
@@ -63,13 +65,29 @@ export default class ghostcam extends Component {
       }
     });
 
-    InAppUtils.loadProducts(
-      ["co.gen.pastcam.frontfacingcamera"],
-      (error, products) => {
-        if (products.length > 0)
-          AlertIOS.alert("loadProducts", JSON.stringify(products));
-      }
-    );
+    // InAppUtils.loadProducts(
+    //   ["co.gen.pastcam.frontfacingcamera"],
+    //   (error, products) => {
+    //     if (products.length > 0)
+    //       AlertIOS.alert("loadProducts", JSON.stringify(products));
+    //   }
+    // );
+
+    // AlertIOS.alert(Orientation.getInitialOrientation(), "lol");
+    const orientationMap = {
+      "LANDSCAPE-LEFT": Camera.constants.Orientation.landscapeLeft,
+      "LANDSCAPE-RIGHT": Camera.constants.Orientation.landscapeRight,
+      PORTRAIT: Camera.constants.Orientation.portrait,
+      PORTRAITUPSIDEDOWN: Camera.constants.Orientation.portrait,
+      UNKONWN: Camera.constants.Orientation.portrait
+    };
+    Orientation.addSpecificOrientationListener(orientationString => {
+      const orientation =
+        orientationMap[orientationString] ||
+        Camera.constants.Orientation.portrait;
+      this.setState({ orientation });
+      // AlertIOS.alert(orientation, "lol");
+    });
   }
   refreshPhotos(after = null) {
     console.log(`after=${after}`);
@@ -91,18 +109,21 @@ export default class ghostcam extends Component {
         });
 
         // AlertIOS.alert("photo[0]", JSON.stringify(photos[0].image.uri));
-        PicStitcher.stitch(photos[0].image.uri, photos[1].image.uri);
+        // PicStitcher.stitch(photos[0].image.uri, photos[1].image.uri);
         // console.log(JSON.stringify(this.state.photos));
       },
       e => logError(e)
     );
   }
   render() {
-    let cameraWidth = width, cameraHeight = height, cameraXOffset = 0;
+    let cameraWidth = width,
+      cameraHeight = height,
+      cameraXOffset = 0;
     if (this.state.selectedImage) {
       // h1/w1 = h2/w2
       // h1 = h2*w1/w2
-      cameraHeight = this.state.selectedImage.height *
+      cameraHeight =
+        this.state.selectedImage.height *
         width /
         this.state.selectedImage.width;
       cameraXOffset = (height - cameraHeight) / 2;
@@ -131,7 +152,7 @@ export default class ghostcam extends Component {
             contentContainerStyle={styles.list}
             dataSource={this.state.dataSource}
             enableEmptySections={false}
-            renderRow={rowData => (
+            renderRow={rowData =>
               <TouchableHighlight
                 onPress={() =>
                   this.setState({
@@ -147,22 +168,22 @@ export default class ghostcam extends Component {
                 >
                   <View
                     style={{
-                      borderColor: this.state.selectedImage === rowData.image
-                        ? "rgb(99, 145, 257)"
-                        : "rgba(0, 0, 0, 0)",
+                      borderColor:
+                        this.state.selectedImage === rowData.image
+                          ? "rgb(99, 145, 257)"
+                          : "rgba(0, 0, 0, 0)",
                       borderWidth: 5,
                       flex: 1
                     }}
                   />
                 </Image>
-              </TouchableHighlight>
-            )}
+              </TouchableHighlight>}
           />
         </Modal>
 
         <StatusBar hidden={true} />
         <Camera
-          ref={cam => this.camera = cam}
+          ref={cam => (this.camera = cam)}
           style={[
             styles.preview,
             {
@@ -179,6 +200,7 @@ export default class ghostcam extends Component {
           type={this.state.flip ? "back" : "front"}
           mirrorImage={this.state.flip}
           flashMode={this.state.flashMode}
+          orientation={this.state.orientation}
         >
           <Image
             style={{
@@ -291,8 +313,8 @@ export default class ghostcam extends Component {
               this.state.flashMode === Camera.constants.FlashMode.auto
                 ? "flash-auto"
                 : this.state.flashMode === Camera.constants.FlashMode.on
-                    ? "flash-on"
-                    : "flash-off"
+                  ? "flash-on"
+                  : "flash-off"
             }
             size={30}
             color="#fff"
@@ -316,7 +338,6 @@ export default class ghostcam extends Component {
             color={this.state.stitch ? "#fff" : "#aaa"}
           />
         </TouchableOpacity>
-
       </View>
     );
   }
@@ -327,7 +348,8 @@ export default class ghostcam extends Component {
         // get height and width
         return new Promise((resolve, reject) => {
           Image.getSize(rawImageData.path, (width, height) =>
-            resolve({ path: rawImageData.path, width, height }));
+            resolve({ path: rawImageData.path, width, height })
+          );
         });
       })
       .then(rawImageData => {
@@ -335,7 +357,8 @@ export default class ghostcam extends Component {
           cameraHeight = rawImageData.height,
           cameraOffset = 0;
         // h1/w1 = h2/w2 => h1 = h2*w1/w2
-        cameraHeight = rawImageData.width *
+        cameraHeight =
+          rawImageData.width *
           this.state.selectedImage.height /
           this.state.selectedImage.width;
         cameraOffset = (rawImageData.height - cameraHeight) / 2;
